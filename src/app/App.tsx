@@ -1,7 +1,10 @@
+import Wheel from "../components/Wheel";
 
 export default function App()
 {
     return (
-        <div>App</div>
+        <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Wheel />
+        </div>
     );
 }
