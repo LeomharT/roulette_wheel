@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-
+import { Easing, Tween, update } from '@tweenjs/tween.js';
 
 const data = [
     { name: 'firstPrize', color: 'yellow', value: 0.3 },
@@ -9,9 +9,17 @@ const data = [
     { name: 'fourthPrize', color: 'purple', value: 0.15 },
     { name: 'fifthPrize', color: 'blue', value: 0.25 }
 ];
+
+const params = {
+    roatation: 0
+};
+
 export default function Wheel()
 {
     const canvas = useRef<HTMLCanvasElement>(null);
+
+
+    const [disable, setDisable] = useState<boolean>(false);
 
 
     const drawCircle = useCallback(() =>
@@ -48,9 +56,36 @@ export default function Wheel()
         }
     }, []);
 
+
+    const rotate = useCallback(() =>
+    {
+        if (disable) return;
+
+        new Tween(params)
+            .to({ roatation: params.roatation + 360 })
+            .onStart(() => { setDisable(true); })
+            .onUpdate(v =>
+            {
+                canvas.current!.style.rotate = `${v.roatation}deg`;
+            })
+            .easing(Easing.Quadratic.Out)
+            .onComplete(() => { setDisable(false); })
+            .start();
+    }, [disable]);
+
     useEffect(() =>
     {
         drawCircle();
+
+
+        const loop = () =>
+        {
+            requestAnimationFrame(loop);
+
+            update();
+        };
+
+        loop();
     }, []);
 
     return (
@@ -58,6 +93,8 @@ export default function Wheel()
             <canvas ref={canvas} width='300' height='300'>
                 <p>Current Price: 25.51</p>
             </canvas>
+
+            <button children='Start' onClick={rotate} disabled={disable} />
         </div>
     );
 }
