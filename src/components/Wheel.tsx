@@ -24,9 +24,14 @@ export default function Wheel()
 
     const drawCircle = useCallback(() =>
     {
+
         const canvasEl = canvas.current as HTMLCanvasElement;
 
         const ctx = canvasEl.getContext('2d');
+
+        if (!ctx) return;
+
+        ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
 
         //Center of the circle
         const x0 = canvasEl.width * 0.5;
@@ -42,15 +47,39 @@ export default function Wheel()
 
             const endAngle = beginAngle + area;
 
-            ctx?.beginPath();
+            ctx.beginPath();
 
-            ctx?.moveTo(x0, y0);
+            ctx.moveTo(x0, y0);
 
-            ctx?.arc(x0, y0, radius, beginAngle, endAngle);
+            ctx.arc(x0, y0, radius, beginAngle, endAngle);
 
             ctx!.fillStyle = i.color;
 
-            ctx?.fill();
+            ctx.fill();
+
+            //At center
+            const textAngle = (beginAngle + endAngle) * 0.5;
+
+
+            ctx.save();
+
+            ctx.font = "15px '微软雅黑'";
+
+            ctx.textAlign = 'start';
+
+            ctx.textBaseline = 'middle';
+
+            const textWidth = ctx.measureText(i.name).width;
+
+            ctx.translate(x0, y0);
+
+            ctx.rotate(textAngle);
+
+            ctx.fillStyle = 'white';
+
+            ctx.fillText(i.name, textWidth / 2, 0);
+
+            ctx.restore();
 
             beginAngle = endAngle;
         }
@@ -61,14 +90,19 @@ export default function Wheel()
     {
         if (disable) return;
 
+        const random_circle = Math.random() * 10;
+        const random_time = Math.random() * 100;
+
+
         new Tween(params)
-            .to({ roatation: params.roatation + 360 })
+            .to({ roatation: params.roatation + 360 * random_circle })
+            .duration(2000 + random_time)
             .onStart(() => { setDisable(true); })
             .onUpdate(v =>
             {
                 canvas.current!.style.rotate = `${v.roatation}deg`;
             })
-            .easing(Easing.Quadratic.Out)
+            .easing(Easing.Quadratic.InOut)
             .onComplete(() => { setDisable(false); })
             .start();
     }, [disable]);
@@ -76,7 +110,6 @@ export default function Wheel()
     useEffect(() =>
     {
         drawCircle();
-
 
         const loop = () =>
         {
@@ -86,11 +119,23 @@ export default function Wheel()
         };
 
         loop();
-    }, []);
+    }, [drawCircle]);
 
     return (
         <div>
-            <canvas ref={canvas} width='300' height='300'>
+            <div className="pointer" style={{
+                borderTop: '20px black solid',
+                borderRight: '20px transparent solid',
+                borderLeft: '20px transparent solid',
+                borderBottom: '20px transparent solid',
+                position: 'absolute',
+                right: "calc(50% - 80px)", top: 20,
+                rotate: '35deg', zIndex: 3
+            }}>
+
+            </div>
+
+            <canvas ref={canvas} width='300' height='300' style={{ width: 300, height: 300 }}>
                 <p>Current Price: 25.51</p>
             </canvas>
 
