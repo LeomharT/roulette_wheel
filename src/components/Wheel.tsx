@@ -63,7 +63,7 @@ export default function Wheel()
 
             ctx.save();
 
-            ctx.font = "15px '微软雅黑'";
+            ctx.font = "20px '微软雅黑'";
 
             ctx.textAlign = 'start';
 
@@ -75,7 +75,7 @@ export default function Wheel()
 
             ctx.rotate(textAngle);
 
-            ctx.fillStyle = 'white';
+            ctx.fillStyle = 'black';
 
             ctx.fillText(i.name, textWidth / 2, 0);
 
